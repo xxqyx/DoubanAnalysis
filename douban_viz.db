@@ -1,0 +1,42 @@
+CREATE DATABASE IF NOT EXISTS douban_viz;
+USE douban_viz;
+
+-- 年度评分趋势表
+CREATE TABLE yearly_rating (
+    year INT PRIMARY KEY,
+    avg_rating FLOAT
+);
+
+-- 导演分析表
+CREATE TABLE director_stats (
+    director VARCHAR(255) PRIMARY KEY,
+    movie_count INT,
+    avg_rating FLOAT
+);
+
+-- 类型分布表
+CREATE TABLE genre_count (
+    genre VARCHAR(255) PRIMARY KEY,
+    count INT
+);
+
+-- 用户评分分布表
+CREATE TABLE user_rating_dist (
+    rating_bin FLOAT PRIMARY KEY,
+    count INT
+);
+
+-- 电影聚类结果表
+CREATE TABLE movie_clusters (
+    movie_id INT PRIMARY KEY,
+    rating FLOAT,
+    rating_count INT,
+    cluster INT
+);
+
+--评分预测表
+CREATE TABLE rating_predictions (
+    movie_id INT PRIMARY KEY,
+    actual_rating FLOAT,
+    predicted_rating FLOAT
+);

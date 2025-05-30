@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户评分分布</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #user-rating-chart {
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>用户评分分布</h2>
+  <div id="user-rating-chart"></div>
+
+  <script>
+    // 获取用户评分分布数据并绘制柱状图
+    fetch('http://localhost:3000/user-rating-dist')
+      .then(response => response.json())
+      .then(data => {
+        const ratingBins = data.map(item => item.rating_bin);
+        const counts = data.map(item => item.count);
+
+        const myChart = echarts.init(document.getElementById('user-rating-chart'));
+        const option = {
+          title: { text: '用户评分分布' },
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'category', data: ratingBins },
+          yAxis: { type: 'value' },
+          series: [{
+            data: counts,
+            type: 'bar'
+          }]
+        };
+        myChart.setOption(option);
+      });
+  </script>
+
+</body>
+</html>
+

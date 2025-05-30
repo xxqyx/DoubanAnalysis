@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导演电影数量排名</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #director-chart {
+      width: 100%;
+      height: 600px;  /* 增加容器高度 */
+    }
+  </style>
+</head>
+<body>
+
+  <h2>导演电影数量排名</h2>
+  <div id="director-chart"></div>
+
+  <script>
+    fetch('http://localhost:3000/director-stats')
+      .then(response => response.json())
+      .then(data => {
+        const topDirectors = data.slice(0, 10);
+        
+        const directors = topDirectors.map(item => item.director);
+        const movieCounts = topDirectors.map(item => item.movie_count);
+
+        const myChart = echarts.init(document.getElementById('director-chart'));
+        const option = {
+          title: { text: '导演电影数量排名' },
+          tooltip: { trigger: 'axis' },
+          grid: {  // 新增grid布局配置
+            top: '15%',
+            bottom: '15%',
+            left: '25%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value',
+            axisLabel: {  // 调整横轴标签样式
+              fontSize: 12,
+              margin: 8
+            },
+            splitLine: {  // 简化横轴网格线
+              show: true,
+              lineStyle: { type: 'dashed' }
+            }
+          },
+          yAxis: {
+            type: 'category',
+            data: directors,
+            inverse: true,
+            axisLabel: {  // 调整纵轴标签样式
+              fontSize: 14,
+              margin: 12
+            },
+            axisTick: { show: false }  // 隐藏纵轴刻度
+          },
+          series: [{
+            data: movieCounts,
+            type: 'bar',
+            barWidth: '60%',  // 调整条状图宽度
+            label: {
+              show: true,
+              position: 'insideLeft',
+              fontSize: 12,
+              color: '#333'
+            },
+            itemStyle: {  // 添加渐变色效果
+              color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [{
+                offset: 0, color: '#83bff6'
+              }, {
+                offset: 1, color: '#188df0'
+              }])
+            }
+          }]
+        };
+        myChart.setOption(option);
+      });
+  </script>
+</body>
+</html>

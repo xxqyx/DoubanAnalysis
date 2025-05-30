@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>评分预测结果</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    #prediction-chart {
+      width: 100%;
+      height: 600px;
+    }
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>评分预测结果（前100部电影）</h2>
+  <div id="prediction-chart"></div>
+
+  <script>
+    fetch('http://localhost:3000/rating-predictions')
+      .then(response => response.json())
+      .then(data => {
+        const limitedData = data.slice(0, 100);
+        const movieIds = limitedData.map(item => item.movie_id);
+        const actualRatings = limitedData.map(item => item.actual_rating);
+        const predictedRatings = limitedData.map(item => item.predicted_rating);
+
+        const myChart = echarts.init(document.getElementById('prediction-chart'));
+        const option = {
+          backgroundColor: '#ffffff',
+          title: {
+            text: '评分预测结果',
+            left: 'center',
+            top: 10,
+            textStyle: {
+              fontSize: 20
+            }
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+              const { data } = params;
+              return `
+                <strong>电影ID:</strong> ${data.movie_id}<br/>
+                <strong>实际评分:</strong> ${data.actual}<br/>
+                <strong>预测评分:</strong> ${data.predicted}
+              `;
+            }
+          },
+          legend: {
+            data: ['实际评分', '预测评分'],
+            top: '8%',
+            left: 'center',
+            type: 'plain'
+          },
+          grid: {
+            top: '20%',
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'category',
+            name: '电影ID',
+            data: movieIds,
+            axisLabel: {
+              interval: 0,
+              rotate: 45,
+              fontSize: 10
+            }
+          },
+          yAxis: {
+            type: 'value',
+            name: '评分',
+            min: 0,
+            max: 10
+          },
+          series: [
+            {
+              name: '实际评分',
+              type: 'line',
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 8,
+              itemStyle: {
+                color: '#5470C6'
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: actualRatings.map((rating, index) => ({
+                value: rating,
+                movie_id: movieIds[index],
+                actual: rating,
+                predicted: predictedRatings[index]
+              }))
+            },
+            {
+              name: '预测评分',
+              type: 'line',
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 8,
+              itemStyle: {
+                color: '#EE6666'
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: predictedRatings.map((rating, index) => ({
+                value: rating,
+                movie_id: movieIds[index],
+                actual: actualRatings[index],
+                predicted: rating
+              }))
+            }
+          ],
+          dataZoom: [] // 禁用缩放
+        };
+
+        myChart.setOption(option);
+
+        // 点击事件
+        myChart.on('click', function (params) {
+          const movieId = params.data.movie_id;
+          const actual = params.data.actual;
+          const predicted = params.data.predicted;
+          const content = `
+            电影ID: ${movieId}\n
+            实际评分: ${actual}\n
+            预测评分: ${predicted}
+          `;
+          alert(content);
+        });
+      });
+  </script>
+
+</body>
+</html>
+

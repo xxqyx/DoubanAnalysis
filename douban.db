@@ -1,0 +1,47 @@
+CREATE DATABASE douban;
+USE douban;
+
+-- 主表 movies
+CREATE TABLE movies (
+    movie_id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_name VARCHAR(255),
+    year INT,
+    director VARCHAR(255),
+    screenwriter VARCHAR(255),
+    country VARCHAR(255),
+    language VARCHAR(255),
+    release_date DATE,
+    rating FLOAT,
+    rating_count INT,
+    synopsis TEXT,
+    duration INT,
+    image_url VARCHAR(512),
+    detail_url VARCHAR(512),
+    video_url VARCHAR(512)
+);
+
+-- 演员表 movie_actors
+CREATE TABLE movie_actors (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_id INT,
+    actor VARCHAR(255),
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
+);
+
+-- 类型表 movie_genres
+CREATE TABLE movie_genres (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_id INT,
+    genre VARCHAR(255),
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
+);
+
+-- 评论表 movie_reviews
+CREATE TABLE movie_reviews (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_id INT,
+    user_name VARCHAR(255),
+    review_content TEXT,
+    user_rating FLOAT,
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
+);

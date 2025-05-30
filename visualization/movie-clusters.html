@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>按聚类结果展示电影分布</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #movie-clusters-chart {
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>按聚类结果展示电影分布</h2>
+  <div id="movie-clusters-chart"></div>
+
+  <script>
+    // 获取电影聚类结果数据并绘制散点图
+    fetch('http://localhost:3000/movie-clusters')
+      .then(response => response.json())
+      .then(data => {
+        // 提取聚类结果数据
+        const ratings = data.map(item => item.rating);
+        const ratingCounts = data.map(item => item.rating_count);
+        const clusters = data.map(item => item.cluster);
+
+        const myChart = echarts.init(document.getElementById('movie-clusters-chart'));
+        const option = {
+          title: { text: '按聚类结果展示电影分布' },
+          tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+              return `电影ID: ${params.dataIndex}<br/>评分: ${params.data[0]}<br/>评分数: ${params.data[1]}<br/>聚类: ${params.data[2]}`;
+            }
+          },
+          xAxis: { type: 'value', name: '评分' },
+          yAxis: { type: 'value', name: '评分数' },
+          legend: {
+            data: ['大众高分电影', '小众高分电影', '低分电影'],
+            top: 'top'
+          },
+          series: [{
+            symbolSize: 10,
+            data: ratings.map((rating, index) => [rating, ratingCounts[index], clusters[index]]),
+            type: 'scatter',
+            itemStyle: {
+              color: function(params) {
+                // 根据聚类结果为每个点设置颜色
+                const cluster = params.data[2];
+                const colors = ['#FF6347', '#FFD700', '#00BFFF']; // 新的颜色配色方案
+                return colors[cluster % colors.length]; // 使用不同颜色
+              }
+            },
+            name: function(params) {
+              // 返回对应聚类的名称
+              const cluster = params.data[2];
+              if (cluster === 0) return '小众高分电影';
+              if (cluster === 1) return '大众高分电影';
+              return '低分电影';
+            }
+          }]
+        };
+        myChart.setOption(option);
+      });
+  </script>
+
+</body>
+</html>
+
