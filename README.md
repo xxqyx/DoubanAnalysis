@@ -55,7 +55,7 @@ hadoop fs -rm -r /user/hadoop/douban/cluster_results
 hadoop fs -rm -r /user/hadoop/douban/kmeans_model
 hadoop fs -rm -r /user/hadoop/douban/linear_model_rating
 
-# 运行 MapReduce - 年度评分趋势
+#运行 MapReduce - 年度评分趋势
 hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -files /usr/local/hadoop/code/mapreduce/yearly_rating_mapper.py,/usr/local/hadoop/code/mapreduce/yearly_rating_reducer.py \
   -input /user/hadoop/douban/movies/part-m-00000 \
@@ -63,7 +63,7 @@ hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -mapper "python3 yearly_rating_mapper.py" \
   -reducer "python3 yearly_rating_reducer.py"
 
-# 运行 MapReduce - 导演分析
+#运行 MapReduce - 导演分析
 hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -files /usr/local/hadoop/code/mapreduce/director_analysis_mapper.py,/usr/local/hadoop/code/mapreduce/director_analysis_reducer.py \
   -input /user/hadoop/douban/movies/part-m-00000 \
@@ -71,7 +71,7 @@ hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -mapper "python3 director_analysis_mapper.py" \
   -reducer "python3 director_analysis_reducer.py"
 
-# 运行 MapReduce - 类型分布
+#运行 MapReduce - 类型分布
 hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -files /usr/local/hadoop/code/mapreduce/genre_distribution_mapper.py,/usr/local/hadoop/code/mapreduce/genre_distribution_reducer.py \
   -input /user/hadoop/douban/movie_genres/part-m-00000 \
@@ -79,7 +79,7 @@ hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -mapper "python3 genre_distribution_mapper.py" \
   -reducer "python3 genre_distribution_reducer.py"
 
-# 运行 MapReduce - 用户评分分布
+#运行 MapReduce - 用户评分分布
 hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
   -files /usr/local/hadoop/code/mapreduce/user_rating_mapper.py,/usr/local/hadoop/code/mapreduce/user_rating_reducer.py \
   -input /user/hadoop/douban/movie_reviews/part-m-00000 \
@@ -91,13 +91,13 @@ echo "[$(date)] MapReduce作业完成。"
 
 echo "[$(date)] 开始运行 Spark 作业..."
 
-# 运行 Spark - 电影聚类
+#运行 Spark - 电影聚类
 spark-submit \
   --master yarn \
   --deploy-mode cluster \
   /usr/local/hadoop/code/spark/movie_clustering.py
 
-# 运行 Spark - 评分预测
+#运行 Spark - 评分预测
 spark-submit \
   --master yarn \
   --deploy-mode cluster \
@@ -107,7 +107,7 @@ echo "[$(date)] Spark作业完成。"
 
 echo "[$(date)] 开始从HDFS提取数据并导入MySQL..."
 
-# 清空本地output目录
+#清空本地output目录
 rm -rf /usr/local/hadoop/code/output/*
 mkdir -p /usr/local/hadoop/code/output
 
@@ -126,8 +126,8 @@ hadoop fs -cat /user/hadoop/douban/linear_model_rating/prediction_results/part-*
   awk -F'\t' '{print $1 "," $2 "," $3}' > ./output/rating_predictions.csv
 
 
-#3. 将分析结果导入mysql
-# 在导入之前，清空MySQL表的数据
+# 3. 将分析结果导入mysql
+#在导入之前，清空MySQL表的数据
 mysql -u root -p douban_viz -e "TRUNCATE TABLE yearly_rating;"
 mysql -u root -p douban_viz -e "TRUNCATE TABLE director_stats;"
 mysql -u root -p douban_viz -e "TRUNCATE TABLE genre_count;"
