@@ -1,4 +1,4 @@
-#1.  将数据导入mysql的表中
+# 1. 将数据导入mysql的表中
 #假设所有数据文件在目录"/var/lib/mysql-files/"下
 -- 导入主表
 LOAD DATA INFILE '/var/lib/mysql-files/movies.csv'
@@ -39,7 +39,7 @@ IGNORE 1 ROWS
 (movie_id, user_name, review_content, user_rating);
 
 
-2.  进行数据分析
+# 2. 进行数据分析
 #启动hadoop
 $HADOOP_HOME/sibin/start-all.sh
 #启动spark虚拟环境
@@ -126,7 +126,7 @@ hadoop fs -cat /user/hadoop/douban/linear_model_rating/prediction_results/part-*
   awk -F'\t' '{print $1 "," $2 "," $3}' > ./output/rating_predictions.csv
 
 
-#3.  将分析结果导入mysql
+#3. 将分析结果导入mysql
 # 在导入之前，清空MySQL表的数据
 mysql -u root -p douban_viz -e "TRUNCATE TABLE yearly_rating;"
 mysql -u root -p douban_viz -e "TRUNCATE TABLE director_stats;"
@@ -149,7 +149,7 @@ mysqlimport --local --ignore-lines=0 --fields-terminated-by=',' \
 mysqlimport --local --ignore-lines=0 --fields-terminated-by=',' \
   -u root -p douban_viz ./output/rating_predictions.csv
 
-# 4.  可视化
+# 4. 可视化
 node app.js		#后端数据库监听
 http-server		#前端
 
