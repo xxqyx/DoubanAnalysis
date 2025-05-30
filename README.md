@@ -111,7 +111,7 @@ echo "[$(date)] 开始从HDFS提取数据并导入MySQL..."
 rm -rf /usr/local/hadoop/code/output/*
 mkdir -p /usr/local/hadoop/code/output
 
-# 下载各分析任务结果
+#下载各分析任务结果
 hadoop fs -cat /user/hadoop/douban/output_yearly_rating/part-* | \
   awk -F'\t' '{print $1 "," $2}' > ./output/yearly_rating.csv
 hadoop fs -cat /user/hadoop/douban/output_director_stats/part-* | \
